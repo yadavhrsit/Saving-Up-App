@@ -44,7 +44,7 @@ function ResetPassword() {
 
       setLoading(true);
       // Code to reset password goes here
-      // Example: await resetPassword(token, password);
+      // await resetPassword(token, password);
       setSuccess(true);
     } catch (errors) {
       setErrors(errors.message);

@@ -21,7 +21,7 @@ function ForgotPassword() {
         throw new Error("Email is required");
       }
       // Code to send reset password email goes here
-      // Example: await sendResetPasswordEmail(email);
+      // sendResetPasswordEmail(email);
       setEmailSent(true);
     } catch (error) {
       setError(error.message);
