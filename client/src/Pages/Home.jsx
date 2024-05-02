@@ -20,6 +20,10 @@ function Home() {
       <a href="/reset-password" className="text-blue-500">
         reset-password
       </a>
+      <br />
+      <a href="/dashboard" className="text-blue-500">
+        dashboard
+      </a>
     </div>
   );
 }

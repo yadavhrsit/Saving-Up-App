@@ -54,9 +54,28 @@ function ResetPassword() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+    <div className="flex flex-col md:flex-row h-screen">
+      <div
+        className="hidden md:block md:w-1/2 md:h-screen bg-cover bg-center"
+        style={{
+          backgroundImage: `url('https://img.freepik.com/free-vector/vector-abstract-wavy-patterned-blue-background_53876-172726.jpg?t=st=1714258206~exp=1714261806~hmac=21dbd27dbab5e368eadb6bd894a905a3ed90606c37b62702ad765ea8a8a455e5&w=740')`,
+        }}
+      >
+        <div className="flex flex-col gap-2 items-center justify-center h-full px-4 py-4">
+          <p className="text-white text-center text-lg lg:text-2xl font-semibold">
+            Welcome back!
+          </p>
+          <h1 className="text-white text-center text-2xl lg:text-5xl font-bold mt-4">
+            Reset Password
+          </h1>
+          <p className="text-white text-center lg:text-xl">
+            Access your account to continue saving up for your desired products.
+          </p>
+        </div>
+      </div>
+      <div className="md:w-1/2 md:h-screen  h-full bg-gray-100 flex flex-col justify-center">
+        <div className="mx-auto max-w-md lg:min-w-[50%] min-w-[90%] px-4 py-8 bg-white shadow-md rounded">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
           Reset Your Password
         </h2>
         {success ? (
@@ -77,9 +96,11 @@ function ResetPassword() {
                   type="password"
                   id="password"
                   name="password"
-                  className={`w-full mt-1 p-2 border rounded-md ${
-                    errors.password ? "border-red-500" : ""
-                  }`}
+                  className={`w-full border border-gray-300 ${
+                    errors.password
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } p-2 rounded-md outline-none focus:border-blue-500`}
                   placeholder="Enter your new password"
                   value={formData.password}
                   onChange={handleChange}
@@ -101,9 +122,11 @@ function ResetPassword() {
                 <input
                   type="password"
                   name="confirmPassword"
-                  className={`w-full mt-1 p-2 border rounded-md ${
-                    errors.confirmPassword ? "border-red-500" : ""
-                  }`}
+                  className={`w-full border border-gray-300 ${
+                    errors.confirmPassword
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } p-2 rounded-md outline-none focus:border-blue-500`}
                   placeholder="Confirm your new password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
@@ -124,8 +147,12 @@ function ResetPassword() {
             </form>
           </>
         )}
+        </div>
       </div>
     </div>
+
+
+    
   );
 }
 

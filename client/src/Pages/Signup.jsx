@@ -68,9 +68,9 @@ function Signup() {
     }
   };
   return (
-    <div className="flex flex-col md:flex-row h-screen">
+    <div className="flex flex-col md:flex-row h-full grow">
       <div
-        className="hidden md:block md:w-1/2 md:h-screen bg-cover bg-center"
+        className="hidden md:block md:w-1/2 bg-cover bg-center"
         style={{
           backgroundImage: `url('https://img.freepik.com/free-vector/vector-abstract-wavy-patterned-blue-background_53876-172726.jpg?t=st=1714258206~exp=1714261806~hmac=21dbd27dbab5e368eadb6bd894a905a3ed90606c37b62702ad765ea8a8a455e5&w=740')`,
         }}
@@ -93,7 +93,7 @@ function Signup() {
           </p>
         </div>
       </div>
-      <div className="md:w-1/2 md:h-screen h-full bg-gray-100 flex flex-col justify-center">
+      <div className="md:w-1/2 grow bg-gray-100 flex flex-col justify-center">
         <div className="mx-auto max-w-md px-4 py-8 bg-white shadow-md rounded">
           <h2 className="text-2xl font-bold mb-4">Create new account</h2>
           <p className="text-gray-600 mb-4">
