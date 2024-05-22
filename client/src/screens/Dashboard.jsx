@@ -10,6 +10,7 @@ import { BASE_URL } from "../constants/api";
 import axios from "axios";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import swal from "sweetalert2";
 import AreaTop from "../components/AreaTop";
 
 const Dashboard = () => {
@@ -110,18 +111,41 @@ const Dashboard = () => {
 
   const handleDeleteItem = async (id) => {
     try {
-      await axios.delete(`${BASE_URL}/api/item/${id}/delete`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const { data } = await swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+        showLoaderOnConfirm: true,
+        preConfirm: async () => {
+          try {
+            await axios.delete(`${BASE_URL}/api/item/${id}/delete`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const updatedItems = items.filter((item) => item._id !== id);
+            setItems(updatedItems);
+            calculateTotals(updatedItems);
+            return true;
+          } catch (error) {
+            console.error("Error deleting item:", error);
+            if (error.response && error.response.status === 401) {
+              localStorage.removeItem("saving_up_token");
+              navigate("/login");
+            }
+            throw new Error(error);
+          }
+        },
+        allowOutsideClick: () => !swal.isLoading(),
       });
-      const updatedItems = items.filter((item) => item._id !== id);
-      setItems(updatedItems);
-      calculateTotals(updatedItems);
-    } catch (error) {
-      console.error("Error deleting item:", error);
-      if (error.response && error.response.status === 401) {
-        localStorage.removeItem("saving_up_token");
-        navigate("/login");
+
+      if (data) {
+        swal.fire("Deleted!", "Your item has been deleted.", "success");
       }
+    } catch (error) {
+      swal.fire("Error!", "An error occurred. Please try again.", "error");
     }
   };
 
@@ -137,12 +161,14 @@ const Dashboard = () => {
       const updatedItems = items.map((item) => (item._id === id ? data : item));
       setItems(updatedItems);
       calculateTotals(updatedItems);
+      swal.fire("Success!", "Contribution added successfully.", "success");
     } catch (error) {
       console.error("Error contributing to item:", error);
       if (error.response && error.response.status === 401) {
         localStorage.removeItem("saving_up_token");
         navigate("/login");
       }
+      swal.fire("Error!",error.response.data.error || "An error occurred. Please try again.", "error");
     }
   };
 
@@ -161,12 +187,18 @@ const Dashboard = () => {
       const updatedItems = items.map((i) => (i._id === item._id ? data : i));
       setItems(updatedItems);
       calculateTotals(updatedItems);
+      swal.fire(
+        "Success!",
+        `${item.favorite ? "Removed from" : "Added to"} favorites.`,
+        "success"
+      );
     } catch (error) {
       console.error("Error toggling favorite:", error);
       if (error.response && error.response.status === 401) {
         localStorage.removeItem("saving_up_token");
         navigate("/login");
       }
+      swal.fire("Error!", "An error occurred. Please try again.", "error");
     }
   };
 
@@ -226,9 +258,7 @@ const Dashboard = () => {
         </div>
         {filteredItems.length > 0 && (
           <div data-aos="fade-left">
-            <h2 className="text-lg font-semibold mb-2">
-              Other Items
-            </h2>
+            <h2 className="text-lg font-semibold mb-2">Other Items</h2>
             <ItemList
               items={filteredItems}
               onDelete={handleDeleteItem}
@@ -240,7 +270,6 @@ const Dashboard = () => {
       </div>
     </div>
   );
-
 };
 
 export default Dashboard;
