@@ -100,7 +100,7 @@ const Sidebar = () => {
                 <button
                   className="menu-link-text"
                   onClick={() => {
-                    localStorage.removeItem("URJA_token");
+                    localStorage.removeItem("saving_up_token");
                     navigate("/login"); 
                   }}
                 >

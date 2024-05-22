@@ -151,21 +151,16 @@ const updateItem = async (req, res) => {
   const {
     name,
     image,
-    targetAmount,
-    contributionFrequency,
-    contributedAmount,
   } = req.body;
   try {
+   
     const itemId = req.params.id;
     const userId = req.user.id;
     const item = await Item.findById({ _id: itemId, user: userId });
+    console.log(item);
     if (item) {
       item.name = name || item.name;
       item.image = image || item.image;
-      item.targetAmount = targetAmount || item.targetAmount;
-      item.contributionFrequency =
-        contributionFrequency || item.contributionFrequency;
-      item.contributedAmount = contributedAmount || item.contributedAmount;
       const updatedItem = await item.save();
       res.json(updatedItem);
     } else {
