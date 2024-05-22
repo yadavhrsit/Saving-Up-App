@@ -10,6 +10,7 @@ import { BASE_URL } from "../constants/api";
 import axios from "axios";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import AreaTop from "../components/AreaTop";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -171,9 +172,7 @@ const Dashboard = () => {
 
   return (
     <div className="container mx-auto px-4">
-      <div className="text-2xl font-semibold mt-6" data-aos="fade-up">
-        Dashboard
-      </div>
+      <AreaTop title={"Dashboard"} />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
         {data.map((item, index) => (
           <div data-aos="fade-up" key={index}>
@@ -186,7 +185,7 @@ const Dashboard = () => {
           </div>
         ))}
       </div>
-      <div className="mt-4">
+      <div className="mt-4" data-aos="fade-down">
         <input
           type="text"
           placeholder="Search items..."
@@ -197,7 +196,6 @@ const Dashboard = () => {
         <button
           className="mt-4 p-2 bg-blue-500 text-white rounded"
           onClick={() => setShowModal(true)}
-          data-aos="fade-up"
         >
           Add New Item
         </button>
@@ -213,7 +211,7 @@ const Dashboard = () => {
         </Modal>
       </div>
       <div className="grid grid-cols-1 gap-4 mt-4">
-        <div>
+        <div data-aos="fade-right">
           <h2 className="text-lg font-semibold mb-2">Favorites</h2>
           {favorites.length > 0 ? (
             <ItemList
@@ -227,8 +225,10 @@ const Dashboard = () => {
           )}
         </div>
         {filteredItems.length > 0 && (
-          <div>
-            <h2 className="text-lg font-semibold mb-2">Other Items</h2>
+          <div data-aos="fade-left">
+            <h2 className="text-lg font-semibold mb-2">
+              Other Items
+            </h2>
             <ItemList
               items={filteredItems}
               onDelete={handleDeleteItem}
@@ -240,6 +240,7 @@ const Dashboard = () => {
       </div>
     </div>
   );
+
 };
 
 export default Dashboard;
