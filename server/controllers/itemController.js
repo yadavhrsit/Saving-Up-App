@@ -76,10 +76,10 @@ const contributeToItem = async (req, res) => {
     const today = moment().startOf("day");
     const nextPaymentDate = moment(item.nextPaymentDate, "MMMM Do, YYYY");
 
-    // Check if today is the next payment date
-    if (!today.isSame(nextPaymentDate)) {
+    // Check 
+    if (today.isBefore(nextPaymentDate, "day")) {
       return res.status(400).json({
-        error: "Contribution is only allowed on the next payment date",
+        error: "Contribution is only allowed on or after the next payment date",
       });
     }
 
