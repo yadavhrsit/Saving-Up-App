@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../constants/api";
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
 
 const AddItemForm = ({ token }) => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,8 @@ const AddItemForm = ({ token }) => {
   const [formErrors, setFormErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [showRedirect, setShowRedirect] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -97,6 +100,12 @@ const AddItemForm = ({ token }) => {
       });
 
       if (error.response && error.response.data) {
+        if (
+          error.response.data.message ===
+          "You cannot add this item because its target amount will exceed your current funds."
+        ) {
+          setShowRedirect(true);
+        }
         setErrorMessage(error.response.data.message);
       } else {
         setErrorMessage("An error occurred. Please try again.");
@@ -232,6 +241,11 @@ const AddItemForm = ({ token }) => {
           role="alert"
         >
           <p>{errorMessage}</p>
+        </div>
+      )}
+      {showRedirect && (
+        <div className="bg-blue-100 border-l-4 border-green-500 text-green-700 p-4 mb-6">
+          <Link to="/settings">Click here to Add Funds</Link>
         </div>
       )}
     </div>
