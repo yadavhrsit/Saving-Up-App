@@ -10,7 +10,7 @@ const getAllItems = async (req, res) => {
 
     const query = {
       user: userId,
-      ...(search && { name: new RegExp(search, "i") })
+      ...(search && { name: new RegExp(search, "i") }),
     };
 
     const items = await Item.find(query);
@@ -19,7 +19,6 @@ const getAllItems = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 // Get item by ID
 const getItemById = async (req, res) => {
@@ -41,7 +40,10 @@ const createItem = async (req, res) => {
     const { name, targetAmount, contributionFrequency, contributedAmount } =
       req.body;
     const userId = req.user.id;
-    const image = req.file ? `/uploads/${req.file.filename}` : null;
+    let image = null;
+    if (req.file) {
+      image = req.file.path;
+    }
     const item = new Item({
       name,
       image,
@@ -72,9 +74,17 @@ const contributeToItem = async (req, res) => {
     }
 
     const today = moment().startOf("day");
+    const nextPaymentDate = moment(item.nextPaymentDate, "MMMM Do, YYYY");
+
+    // Check if today is the next payment date
+    if (!today.isSame(nextPaymentDate)) {
+      return res.status(400).json({
+        error: "Contribution is only allowed on the next payment date",
+      });
+    }
+
     let isPaymentDay = false;
     let contributionAmount = 0;
-    let missedContributions = 0;
 
     switch (item.contributionFrequency) {
       case "daily":
@@ -93,36 +103,12 @@ const contributeToItem = async (req, res) => {
         break;
     }
 
-    // Calculate missed contribution count
-    if (!isPaymentDay) {
-      const startDate = moment(item.startDate);
-      const endDate = today.clone().subtract(1, "day");
-      const duration = moment.duration(endDate.diff(startDate)).asDays();
-      missedContributions = Math.max(
-        0,
-        Math.floor(duration / getFrequencyInDays(item.contributionFrequency))
-      );
-    }
-
-    // Check if payment is allowed before the next due date
-    const nextPaymentDate = moment(item.startDate).add(
-      missedContributions + 1,
-      item.contributionFrequency
-    );
-    if (today.isBefore(nextPaymentDate)) {
-      return res
-        .status(400)
-        .json({ error: "Payment is not allowed before the next due date" });
-    }
-
-    // Ensure payment doesn't exceed the budget
+    // Ensure contribution doesn't exceed the remaining budget
     const remainingBudget = item.targetAmount - item.contributedAmount;
-    if (contributionAmount > remainingBudget) {
-      contributionAmount = remainingBudget;
-    }
+    contributionAmount = Math.min(contributionAmount, remainingBudget);
 
+    // Update item's contributed amount
     item.contributedAmount += contributionAmount;
-    item.missedContributions = missedContributions;
     await item.save();
 
     res.status(200).json(item);
@@ -146,14 +132,42 @@ const getFrequencyInDays = (frequency) => {
   }
 };
 
+// Mark item as favorite
+const markAsFavorite = async (req, res) => {
+  try {
+    const itemId = req.params.id;
+    const item = await Item.findById(itemId);
+    if (item.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+    item.favorite = true;
+    await item.save();
+    res.json(item);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Remove item from favorites
+const removeFromFavorite = async (req, res) => {
+  try {
+    const itemId = req.params.id;
+    const item = await Item.findById(itemId);
+    if (item.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+    item.favorite = false;
+    await item.save();
+    res.json(item);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Update item
 const updateItem = async (req, res) => {
-  const {
-    name,
-    image,
-  } = req.body;
+  const { name, image } = req.body;
   try {
-   
     const itemId = req.params.id;
     const userId = req.user.id;
     const item = await Item.findById({ _id: itemId, user: userId });
@@ -196,6 +210,9 @@ module.exports = {
   getItemById,
   createItem,
   contributeToItem,
+  markAsFavorite,
+  getFrequencyInDays,
+  removeFromFavorite,
   updateItem,
   deleteItem,
 };

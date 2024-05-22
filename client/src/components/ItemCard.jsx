@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { FaTrash, FaPlusCircle } from "react-icons/fa";
+import { FaTrash, FaPlusCircle, FaHeart, FaRegHeart } from "react-icons/fa";
 import moment from "moment";
 
-const ItemCard = ({ item, onDelete, onContribute }) => {
+const ItemCard = ({ item, onDelete, onContribute, onToggleFavorite }) => {
   const [isContributionDay, setIsContributionDay] = useState(false);
   const [missedContributions, setMissedContributions] = useState(0);
+  const [nextPaymentDate, setNextPaymentDate] = useState(null);
 
   useEffect(() => {
     const calculateContributionStatus = () => {
@@ -36,6 +37,13 @@ const ItemCard = ({ item, onDelete, onContribute }) => {
       }
 
       setMissedContributions(missedCount);
+
+      // Calculate the next payment date
+      const nextDate = moment(item.startDate).add(
+        missedCount + 1,
+        item.contributionFrequency
+      );
+      setNextPaymentDate(nextDate.format("MMMM Do, YYYY"));
     };
 
     calculateContributionStatus();
@@ -47,8 +55,14 @@ const ItemCard = ({ item, onDelete, onContribute }) => {
     }
   };
 
+  // Calculate progress percentage
+  const progressPercentage = Math.min(
+    (item.contributedAmount / item.targetAmount) * 100,
+    100
+  );
+
   return (
-    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 flex flex-row justify-between items-center transition duration-300 ease-in-out transform hover:scale-105">
+    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 flex flex-col lg:flex-row justify-between items-center transition duration-300 ease-in-out transform hover:scale-105">
       <div className="flex flex-col justify-between flex-grow lg:pr-6">
         <div>
           <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
@@ -86,16 +100,30 @@ const ItemCard = ({ item, onDelete, onContribute }) => {
               {missedContributions}
             </span>
           </div>
-          {item.nextPaymentDate && (
+          {nextPaymentDate && (
             <div className="mb-4">
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 Next Payment Date:{" "}
               </span>
               <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                {item.nextPaymentDate}
+                {nextPaymentDate}
               </span>
             </div>
           )}
+        </div>
+        <div className="flex items-center w-full">
+          <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+            <div
+              className="bg-green-500 h-full"
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
+          </div>
+        </div>
+        <div className="flex justify-between mt-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400">Progress</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {progressPercentage.toFixed(2)}%
+          </p>
         </div>
         <div className="flex space-x-4 mt-4">
           {(isContributionDay || missedContributions > 0) && (
@@ -112,17 +140,27 @@ const ItemCard = ({ item, onDelete, onContribute }) => {
           >
             <FaTrash size="1.5em" />
           </button>
+          <button
+            onClick={() => onToggleFavorite(item)}
+            className="flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            {item.favorite ? (
+              <FaHeart size="1.5em" />
+            ) : (
+              <FaRegHeart size="1.5em" />
+            )}
+          </button>
         </div>
       </div>
-      {item.image && (
-        <div className="w-full lg:w-2/5 mt-4 lg:mt-0 flex justify-center lg:justify-end">
+      <div className="w-full lg:w-2/5 mt-4 lg:mt-0 lg:order-first lg:pl-6 mx-1">
+        {item.image && (
           <img
             src={item.image}
             alt={item.name}
-            className="object-cover h-40 w-40 lg:h-60 lg:w-60 rounded-lg shadow-lg"
+            className="object-contain h-40 w-40 lg:h-60 lg:w-60 rounded-lg shadow-lg mx-auto"
           />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

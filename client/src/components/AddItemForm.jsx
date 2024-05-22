@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../constants/api";
+import Swal from "sweetalert2";
 
 const AddItemForm = ({ token }) => {
   const [formData, setFormData] = useState({
     name: "",
-    targetAmount: "",
+    targetAmount: 0,
     image: null,
     imagePreview: null,
     contributionFrequency: "daily",
@@ -46,17 +47,33 @@ const AddItemForm = ({ token }) => {
 
     const data = new FormData();
     data.append("name", formData.name);
-    data.append("targetAmount", formData.targetAmount);
+    data.append("targetAmount", parseInt(formData.targetAmount));
     data.append("contributionFrequency", formData.contributionFrequency);
     data.append("numberOfPayments", formData.numberOfPayments);
     if (formData.image) {
       data.append("image", formData.image);
     }
 
+    // Show loading
+    Swal.fire({
+      title: "Please wait...",
+      allowOutsideClick: false,
+      onBeforeOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     try {
       const response = await axios.post(`${BASE_URL}/api/item/create`, data, {
         headers: { Authorization: `Bearer ${token}` },
         "Content-Type": "multipart/form-data",
+      });
+
+      // Show success message
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: response.data.message,
       });
 
       setSuccessMessage(response.data.message);
@@ -69,11 +86,16 @@ const AddItemForm = ({ token }) => {
         numberOfPayments: 1,
       });
       setFormErrors({});
-      setSuccessMessage("Item added successfully.")
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
     } catch (error) {
+      // Show error message
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response
+          ? error.response.data.message
+          : "An error occurred. Please try again.",
+      });
+
       if (error.response && error.response.data) {
         setErrorMessage(error.response.data.message);
       } else {

@@ -30,12 +30,22 @@ const itemSchema = new mongoose.Schema({
   contributedAmount: {
     type: Number,
     default: 0,
+    set: function (val) {
+      return parseFloat(val.toFixed(2));
+    },
   },
   remainingAmount: {
     type: Number,
+    set: function (val) {
+      return parseFloat(val.toFixed(2));
+    },
   },
-  nextPaymentDate:{
-    type: String
+  nextPaymentDate: {
+    type: String,
+  },
+  favorite: {
+    type: Boolean,
+    default: false,
   },
   createdAt: {
     type: Date,
@@ -46,6 +56,21 @@ const itemSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+const getFrequencyInDays = (frequency) => {
+  switch (frequency) {
+    case "daily":
+      return 1;
+    case "weekly":
+      return 7;
+    case "monthly":
+      return 30; // Assuming 30 days in a month
+    default:
+      return 1;
+  }
+};
+
+
 itemSchema.pre("save", function (next) {
   const today = moment();
   let missedContributions = 0;

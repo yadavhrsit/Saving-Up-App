@@ -10,7 +10,6 @@ import { BASE_URL } from "../constants/api";
 import axios from "axios";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import AreaTop from "../components/AreaTop";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -39,12 +38,13 @@ const Dashboard = () => {
       title: "Upcoming Contributions",
       icon: FaCalendarAlt,
       data: "0",
-      color: "#fff563",
+      color: "#ff0000",
     },
   ]);
 
   const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
 
@@ -64,7 +64,6 @@ const Dashboard = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setItems(data);
-        setFilteredItems(data); // Initialize filtered items with all items
         calculateTotals(data);
       } catch (error) {
         console.error("Error fetching items:", error);
@@ -78,10 +77,18 @@ const Dashboard = () => {
   }, [token, navigate]);
 
   useEffect(() => {
-    // Update filteredItems based on search query
     setFilteredItems(
-      items.filter((item) =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      items.filter(
+        (item) =>
+          !item.favorite &&
+          item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+    setFavorites(
+      items.filter(
+        (item) =>
+          item.favorite &&
+          item.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
     );
   }, [searchQuery, items]);
@@ -107,7 +114,6 @@ const Dashboard = () => {
       });
       const updatedItems = items.filter((item) => item._id !== id);
       setItems(updatedItems);
-      setFilteredItems(updatedItems);
       calculateTotals(updatedItems);
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -129,7 +135,6 @@ const Dashboard = () => {
       );
       const updatedItems = items.map((item) => (item._id === id ? data : item));
       setItems(updatedItems);
-      setFilteredItems(updatedItems);
       calculateTotals(updatedItems);
     } catch (error) {
       console.error("Error contributing to item:", error);
@@ -140,35 +145,57 @@ const Dashboard = () => {
     }
   };
 
-  return (
-    <>
-      <AreaTop title={"Dashboard"} />
+  const toggleFavorite = async (item) => {
+    try {
+      const url = `${BASE_URL}/api/item/${item._id}/${
+        item.favorite ? "unfavorite" : "favorite"
+      }`;
+      const { data } = await axios.put(
+        url,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const updatedItems = items.map((i) => (i._id === item._id ? data : i));
+      setItems(updatedItems);
+      calculateTotals(updatedItems);
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem("saving_up_token");
+        navigate("/login");
+      }
+    }
+  };
 
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
-          {data.map((item, index) => (
-            <div data-aos="fade-down" key={index}>
-              <DataCard
-                title={item.title}
-                icon={item.icon}
-                data={item.data}
-                color={item.color}
-              />
-            </div>
-          ))}
-        </div>
-        <div className="mt-4">
-          <input
-            type="text"
-            placeholder="Search items..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded"
-            data-aos="fade-up"
-          />
-        </div>
+  return (
+    <div className="container mx-auto px-4">
+      <div className="text-2xl font-semibold mt-6" data-aos="fade-up">
+        Dashboard
+      </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
+        {data.map((item, index) => (
+          <div data-aos="fade-up" key={index}>
+            <DataCard
+              title={item.title}
+              icon={item.icon}
+              data={item.data}
+              color={item.color}
+            />
+          </div>
+        ))}
+      </div>
+      <div className="mt-4">
+        <input
+          type="text"
+          placeholder="Search items..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded"
+        />
         <button
-          className="mt-4 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200 ease-in-out"
+          className="mt-4 p-2 bg-blue-500 text-white rounded"
           onClick={() => setShowModal(true)}
           data-aos="fade-up"
         >
@@ -184,15 +211,34 @@ const Dashboard = () => {
             }}
           />
         </Modal>
-        <div data-aos="fade-up">
-          <ItemList
-            items={filteredItems}
-            onDelete={handleDeleteItem}
-            onContribute={handleContribute}
-          />
-        </div>
       </div>
-    </>
+      <div className="grid grid-cols-1 gap-4 mt-4">
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Favorites</h2>
+          {favorites.length > 0 ? (
+            <ItemList
+              items={favorites}
+              onDelete={handleDeleteItem}
+              onContribute={handleContribute}
+              onToggleFavorite={toggleFavorite}
+            />
+          ) : (
+            <p className="text-gray-500">No favorite items found</p>
+          )}
+        </div>
+        {filteredItems.length > 0 && (
+          <div>
+            <h2 className="text-lg font-semibold mb-2">Other Items</h2>
+            <ItemList
+              items={filteredItems}
+              onDelete={handleDeleteItem}
+              onContribute={handleContribute}
+              onToggleFavorite={toggleFavorite}
+            />
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
