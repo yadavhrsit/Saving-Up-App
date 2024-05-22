@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../constants/api";
 import AreaTop from "../components/AreaTop";
+import swal from "sweetalert2";
 
 function Settings() {
   const [user, setUser] = useState({});
@@ -101,9 +102,11 @@ function Settings() {
       setSuccessMessage("Details updated successfully");
       setFormErrors({});
       setLoading(false);
+      swal.fire("Success", "Details updated successfully", "success");
     } catch (error) {
       setError(error.response.data.message || error.message);
       setLoading(false);
+      swal.fire("Error", error.response.data.message || error.message, "error");
     }
   };
 
