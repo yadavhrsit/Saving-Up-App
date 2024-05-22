@@ -49,9 +49,6 @@ const createItem = async (req, res) => {
 
     // Check if total target amount exceeds user's balance
     if (totalTargetAmount + parseInt(targetAmount) > user.funds) {
-      console.log(totalTargetAmount);
-      console.log(user.funds);
-      console.log(targetAmount);
 
       return res.status(400).json({ message: "You cannot add this item because its target amount will exceed your current funds." });
     }
