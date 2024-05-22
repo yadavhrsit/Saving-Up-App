@@ -10,6 +10,7 @@ import { BASE_URL } from "../constants/api";
 import axios from "axios";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import AreaTop from "../components/AreaTop";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ const Dashboard = () => {
       title: "Upcoming Contributions",
       icon: FaCalendarAlt,
       data: "0",
-      color: "#ff0000",
+      color: "#fff563",
     },
   ]);
 
@@ -140,57 +141,58 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="container mx-auto px-4">
-      <div className="text-2xl font-semibold mt-6" data-aos="fade-up">
-        Dashboard
-      </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
-        {data.map((item, index) => (
-          <div data-aos="fade-down" key={index}>
-            <DataCard
-              title={item.title}
-              icon={item.icon}
-              data={item.data}
-              color={item.color}
-            />
-          </div>
-        ))}
-      </div>
-      <div className="mt-4">
-        <input
-          type="text"
-          placeholder="Search items..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
+    <>
+      <AreaTop title={"Dashboard"} />
+
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
+          {data.map((item, index) => (
+            <div data-aos="fade-down" key={index}>
+              <DataCard
+                title={item.title}
+                icon={item.icon}
+                data={item.data}
+                color={item.color}
+              />
+            </div>
+          ))}
+        </div>
+        <div className="mt-4">
+          <input
+            type="text"
+            placeholder="Search items..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded"
+            data-aos="fade-up"
+          />
+        </div>
+        <button
+          className="mt-4 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200 ease-in-out"
+          onClick={() => setShowModal(true)}
           data-aos="fade-up"
-        />
+        >
+          Add New Item
+        </button>
+        <Modal show={showModal} onClose={() => setShowModal(false)}>
+          <AddItemForm
+            token={token}
+            setItems={(newItems) => {
+              setItems(newItems);
+              setFilteredItems(newItems);
+              calculateTotals(newItems);
+            }}
+          />
+        </Modal>
+        <div data-aos="fade-up">
+          <ItemList
+            items={filteredItems}
+            onDelete={handleDeleteItem}
+            onContribute={handleContribute}
+          />
+        </div>
       </div>
-      <button
-        className="mt-4 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200 ease-in-out"
-        onClick={() => setShowModal(true)}
-        data-aos="fade-up"
-      >
-        Add New Item
-      </button>
-      <Modal show={showModal} onClose={() => setShowModal(false)}>
-        <AddItemForm
-          token={token}
-          setItems={(newItems) => {
-            setItems(newItems);
-            setFilteredItems(newItems);
-            calculateTotals(newItems);
-          }}
-        />
-      </Modal>
-      <div data-aos="fade-up">
-        <ItemList
-          items={filteredItems}
-          onDelete={handleDeleteItem}
-          onContribute={handleContribute}
-        />
-      </div>
-    </div>
+    </>
   );
 };
 
