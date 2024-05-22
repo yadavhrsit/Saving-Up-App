@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../constants/api";
 import Swal from "sweetalert2";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const AddItemForm = ({ token }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     targetAmount: 0,
@@ -105,6 +106,16 @@ const AddItemForm = ({ token }) => {
           "You cannot add this item because its target amount will exceed your current funds."
         ) {
           setShowRedirect(true);
+          Swal.fire({
+            title: "Alert!",
+            text: "Your amount exceed your current funds.",
+            icon: "warning",
+            confirmButtonText: "Add Funds",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              navigate("/settings");
+            }
+          });
         }
         setErrorMessage(error.response.data.message);
       } else {
