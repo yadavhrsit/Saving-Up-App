@@ -94,9 +94,9 @@ const Dashboard = () => {
     const totalTarget = items.reduce((acc, item) => acc + item.targetAmount, 0);
     setData((prevData) => [
       { ...prevData[0], data: items.length },
-      { ...prevData[1], data: `₹${totalSaved}` },
-      { ...prevData[2], data: `₹${totalTarget}` },
-      { ...prevData[3], data: `₹${10000 - totalSaved}` },
+      { ...prevData[1], data: `$${totalSaved}` },
+      { ...prevData[2], data: `$${totalTarget}` },
+      { ...prevData[3], data: `$${10000 - totalSaved}` },
     ]);
   };
 

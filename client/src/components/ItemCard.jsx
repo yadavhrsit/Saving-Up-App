@@ -59,7 +59,7 @@ const ItemCard = ({ item, onDelete, onContribute }) => {
               Target:{" "}
             </span>
             <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-              ₹{item.targetAmount}
+              ${item.targetAmount}
             </span>
           </div>
           <div className="mb-4">
@@ -67,7 +67,7 @@ const ItemCard = ({ item, onDelete, onContribute }) => {
               Saved:{" "}
             </span>
             <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-              ₹{item.contributedAmount}
+              ${item.contributedAmount}
             </span>
           </div>
           <div className="mb-4">
@@ -75,7 +75,7 @@ const ItemCard = ({ item, onDelete, onContribute }) => {
               Remaining:{" "}
             </span>
             <span className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-              ₹{item.remainingAmount}
+              ${item.remainingAmount}
             </span>
           </div>
           <div className="mb-4">
