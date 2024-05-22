@@ -12,6 +12,7 @@ function Settings() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    funds: 0,
     password: "",
   });
   const [formErrors, setFormErrors] = useState({});
@@ -33,6 +34,7 @@ function Settings() {
         setFormData({
           name: userData.username,
           email: userData.email,
+          funds: userData.funds,
           password: "",
         });
         setLoading(false);
@@ -57,6 +59,8 @@ function Settings() {
 
     if (!data.name) errors.name = "Name is required";
     if (!data.email) errors.email = "Email is required";
+    if (data.email && !/\S+@\S+\.\S+/.test(data.email)) errors.email = "Invalid email address";
+    if (data.funds && isNaN(data.funds)) errors.funds = "Funds must be a number";
     if (data.password && data.password.length < 6)
       errors.password = "Password must be at least 6 characters long";
 
@@ -78,6 +82,7 @@ function Settings() {
     if (
       formData.name === initialUser.username &&
       formData.email === initialUser.email &&
+      formData.funds === initialUser.funds &&
       formData.password === ""
     ) {
       setUnchangedMessage("No changes to update");
@@ -194,6 +199,27 @@ function Settings() {
               {formErrors.email && (
                 <div className="text-red-500 text-sm mt-1">
                   {formErrors.email}
+                </div>
+              )}
+            </div>
+            <div>
+              <label className="block text-gray-700 dark:text-gray-300">
+                Funds:
+              </label>
+              <input
+                type="number"
+                name="funds"
+                value={formData.funds}
+                onChange={handleChange}
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  formErrors.funds
+                    ? "border-red-500 focus:ring-red-400"
+                    : "focus:ring-blue-400"
+                }`}
+              />
+              {formErrors.funds && (
+                <div className="text-red-500 text-sm mt-1">
+                  {formErrors.funds}
                 </div>
               )}
             </div>

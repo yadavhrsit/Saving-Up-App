@@ -74,7 +74,7 @@ const AddItemForm = ({ token }) => {
         icon: "success",
         title: "Success",
         text: response.data.message,
-      });
+      })
 
       setSuccessMessage(response.data.message);
       setFormData({

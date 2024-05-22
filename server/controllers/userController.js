@@ -56,6 +56,7 @@ const getUserProfile = async (req, res) => {
       username: user.username,
       email: user.email,
       items: user.items,
+      funds: user.funds,
     });
   } else {
     res.status(404).json({ message: "User not found" });
@@ -68,6 +69,7 @@ const updateUserProfile = async (req, res) => {
   if (user) {
     user.username = req.body.username || user.username;
     user.email = req.body.email || user.email;
+    user.funds = req.body.funds || user.funds;
     if (req.body.password) {
       user.password = req.body.password;
     }
@@ -76,6 +78,7 @@ const updateUserProfile = async (req, res) => {
       _id: updatedUser._id,
       username: updatedUser.username,
       email: updatedUser.email,
+      funds: updatedUser.funds,
       token: generateToken(updatedUser._id),
     });
   } else {
