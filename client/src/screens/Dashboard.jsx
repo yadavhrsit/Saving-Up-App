@@ -6,17 +6,23 @@ import AddItemForm from "../components/AddItemForm";
 import Modal from "../components/Modal";
 import AreaTop from "../components/AreaTop";
 import { AiOutlineOrderedList } from "react-icons/ai";
-import { FaPiggyBank, FaBullseye, FaCalendarAlt } from "react-icons/fa";
+import { FaPiggyBank, FaBullseye } from "react-icons/fa";
+import {
+  FaMoneyBillWave,
+  FaRegMoneyBillAlt,
+} from "react-icons/fa";
 import { BASE_URL } from "../constants/api";
 import axios from "axios";
 import Swal from "sweetalert2";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("saving_up_token");
-
+  const [user, setUser] = useState({});
+  const [totalTarget, setTotalTarget] = useState(0);
   const [data, setData] = useState([
     {
       title: "Total Savings Plans",
@@ -37,10 +43,16 @@ const Dashboard = () => {
       color: "#ff0000",
     },
     {
-      title: "Upcoming Contributions",
-      icon: FaCalendarAlt,
-      data: "0",
-      color: "#ff0000",
+      title: "Total Funds",
+      icon: FaMoneyBillWave,
+      data: 0,
+      color: "#ff9900",
+    },
+    {
+      title: "Unallocated Funds",
+      icon: FaRegMoneyBillAlt,
+      data: 0,
+      color: "#800080",
     },
   ]);
 
@@ -49,6 +61,25 @@ const Dashboard = () => {
   const [favorites, setFavorites] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
+
+  
+
+  useEffect(() => {
+    setFilteredItems(
+      items.filter(
+        (item) =>
+          !item.favorite &&
+          item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+    setFavorites(
+      items.filter(
+        (item) =>
+          item.favorite &&
+          item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+  }, [searchQuery, items]);
 
   useEffect(() => {
     AOS.init({
@@ -76,37 +107,46 @@ const Dashboard = () => {
       }
     };
     fetchItems();
-  }, [token, navigate]);
 
-  useEffect(() => {
-    setFilteredItems(
-      items.filter(
-        (item) =>
-          !item.favorite &&
-          item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
-    setFavorites(
-      items.filter(
-        (item) =>
-          item.favorite &&
-          item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
-  }, [searchQuery, items]);
+    const fetchUser = async () => {
+      try {
+        const { data } = await axios.get(`${BASE_URL}/api/user/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(data);
+        setData((prevData) => {
+          let newData = [...prevData];
+          newData[2] = { ...newData[2], data: `$${data.totalAllocatedFunds}` };
+          newData[3] = { ...newData[3], data: `$${data.funds}` };
+          newData[4] = {
+            ...newData[4],
+            data: `$${data.funds - data.totalAllocatedFunds}`,
+          };
+          return newData;
+        });
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem("saving_up_token");
+          navigate("/login");
+        }
+      }
+    };
+    fetchUser();
+  }, [token, navigate]);
 
   const calculateTotals = (items) => {
     const totalSaved = items.reduce(
       (acc, item) => acc + item.contributedAmount,
       0
     );
-    const totalTarget = items.reduce((acc, item) => acc + item.targetAmount, 0);
-    setData((prevData) => [
-      { ...prevData[0], data: items.length },
-      { ...prevData[1], data: `$${totalSaved}` },
-      { ...prevData[2], data: `$${totalTarget}` },
-      { ...prevData[3], data: `$${10000 - totalSaved}` },
-    ]);
+    setTotalTarget(items.reduce((acc, item) => acc + item.targetAmount, 0));
+    setData((prevData) => {
+      let newData = [...prevData]; // create a copy of the previous data
+      newData[0] = { ...newData[0], data: items.length };
+      newData[1] = { ...newData[1], data: `$${totalSaved}` };
+      return newData;
+    });
   };
 
   const handleDeleteItem = async (id) => {

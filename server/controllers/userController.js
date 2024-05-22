@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Item = require("../models/Item");
 const generateToken = require("../utils/generateToken");
 
 // Register a new user
@@ -51,12 +52,22 @@ const loginUser = async (req, res) => {
 const getUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id);
   if (user) {
+    // Fetch user's items
+    const items = await Item.find({ user: user._id });
+
+    // Calculate total allocated funds
+    const totalAllocatedFunds = items.reduce(
+      (sum, item) => sum + item.targetAmount,
+      0
+    );
+
     res.json({
       _id: user._id,
       username: user.username,
       email: user.email,
       items: user.items,
       funds: user.funds,
+      totalAllocatedFunds, 
     });
   } else {
     res.status(404).json({ message: "User not found" });
