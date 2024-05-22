@@ -4,14 +4,14 @@ import DataCard from "../components/DataCard";
 import ItemList from "../components/ItemList";
 import AddItemForm from "../components/AddItemForm";
 import Modal from "../components/Modal";
+import AreaTop from "../components/AreaTop";
 import { AiOutlineOrderedList } from "react-icons/ai";
 import { FaPiggyBank, FaBullseye, FaCalendarAlt } from "react-icons/fa";
 import { BASE_URL } from "../constants/api";
 import axios from "axios";
+import Swal from "sweetalert2";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import swal from "sweetalert2";
-import AreaTop from "../components/AreaTop";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -111,7 +111,7 @@ const Dashboard = () => {
 
   const handleDeleteItem = async (id) => {
     try {
-      const { data } = await swal.fire({
+      const result = await Swal.fire({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
         icon: "warning",
@@ -119,33 +119,24 @@ const Dashboard = () => {
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, delete it!",
-        showLoaderOnConfirm: true,
-        preConfirm: async () => {
-          try {
-            await axios.delete(`${BASE_URL}/api/item/${id}/delete`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            const updatedItems = items.filter((item) => item._id !== id);
-            setItems(updatedItems);
-            calculateTotals(updatedItems);
-            return true;
-          } catch (error) {
-            console.error("Error deleting item:", error);
-            if (error.response && error.response.status === 401) {
-              localStorage.removeItem("saving_up_token");
-              navigate("/login");
-            }
-            throw new Error(error);
-          }
-        },
-        allowOutsideClick: () => !swal.isLoading(),
       });
 
-      if (data) {
-        swal.fire("Deleted!", "Your item has been deleted.", "success");
+      if (result.isConfirmed) {
+        await axios.delete(`${BASE_URL}/api/item/${id}/delete`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const updatedItems = items.filter((item) => item._id !== id);
+        setItems(updatedItems);
+        calculateTotals(updatedItems);
+        Swal.fire("Deleted!", "Your item has been deleted.", "success");
       }
     } catch (error) {
-      swal.fire("Error!", "An error occurred. Please try again.", "error");
+      console.error("Error deleting item:", error);
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem("saving_up_token");
+        navigate("/login");
+      }
+      Swal.fire("Error!", "There was an error deleting the item.", "error");
     }
   };
 
@@ -161,14 +152,19 @@ const Dashboard = () => {
       const updatedItems = items.map((item) => (item._id === id ? data : item));
       setItems(updatedItems);
       calculateTotals(updatedItems);
-      swal.fire("Success!", "Contribution added successfully.", "success");
+      Swal.fire("Success!", "Your contribution was successful.", "success");
     } catch (error) {
       console.error("Error contributing to item:", error);
       if (error.response && error.response.status === 401) {
         localStorage.removeItem("saving_up_token");
         navigate("/login");
       }
-      swal.fire("Error!",error.response.data.error || "An error occurred. Please try again.", "error");
+      Swal.fire(
+        "Error!",
+        error.response.data.error ||
+        "There was an error contributing to the item.",
+        "error"
+      );
     }
   };
 
@@ -187,27 +183,26 @@ const Dashboard = () => {
       const updatedItems = items.map((i) => (i._id === item._id ? data : i));
       setItems(updatedItems);
       calculateTotals(updatedItems);
-      swal.fire(
-        "Success!",
-        `${item.favorite ? "Removed from" : "Added to"} favorites.`,
-        "success"
-      );
+      Swal.fire("Success!", "The item has been updated.", "success");
     } catch (error) {
       console.error("Error toggling favorite:", error);
       if (error.response && error.response.status === 401) {
         localStorage.removeItem("saving_up_token");
         navigate("/login");
       }
-      swal.fire("Error!", "An error occurred. Please try again.", "error");
+      Swal.fire("Error!", "There was an error updating the item.", "error");
     }
   };
 
   return (
     <div className="container mx-auto px-4">
-      <AreaTop title={"Dashboard"} />
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
+      <AreaTop title="Dashboard" />
+      <div
+        className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4"
+        data-aos="fade-up"
+      >
         {data.map((item, index) => (
-          <div data-aos="fade-up" key={index}>
+          <div key={index}>
             <DataCard
               title={item.title}
               icon={item.icon}
@@ -217,7 +212,7 @@ const Dashboard = () => {
           </div>
         ))}
       </div>
-      <div className="mt-4" data-aos="fade-down">
+      <div className="mt-4">
         <input
           type="text"
           placeholder="Search items..."
@@ -243,7 +238,7 @@ const Dashboard = () => {
         </Modal>
       </div>
       <div className="grid grid-cols-1 gap-4 mt-4">
-        <div data-aos="fade-right">
+        <div data-aos="fade-left">
           <h2 className="text-lg font-semibold mb-2">Favorites</h2>
           {favorites.length > 0 ? (
             <ItemList
@@ -257,7 +252,7 @@ const Dashboard = () => {
           )}
         </div>
         {filteredItems.length > 0 && (
-          <div data-aos="fade-left">
+          <div data-aos="fade-right">
             <h2 className="text-lg font-semibold mb-2">Other Items</h2>
             <ItemList
               items={filteredItems}

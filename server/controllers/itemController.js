@@ -37,13 +37,26 @@ const getItemById = async (req, res) => {
 // Create new item
 const createItem = async (req, res) => {
   try {
-    const { name, targetAmount, contributionFrequency, contributedAmount } =
-      req.body;
+    const { name, targetAmount, contributionFrequency, contributedAmount } = req.body;
     const userId = req.user.id;
+
+    // Fetch user and user's items
+    const user = await User.findById(userId);
+    const items = await Item.find({ user: userId });
+
+    // Calculate total target amount of all items
+    const totalTargetAmount = items.reduce((sum, item) => sum + item.targetAmount, 0);
+
+    // Check if total target amount exceeds user's balance
+    if (totalTargetAmount + targetAmount > user.funds) {
+      return res.status(400).json({ message: "You cannot add this item because its target amount will exceed your current funds." });
+    }
+
     let image = null;
     if (req.file) {
       image = req.file.path;
     }
+
     const item = new Item({
       name,
       image,
@@ -52,14 +65,15 @@ const createItem = async (req, res) => {
       contributionFrequency,
       contributedAmount,
     });
+
     const createdItem = await item.save();
     await User.findByIdAndUpdate(userId, { $push: { items: createdItem._id } });
+
     res.status(201).json(createdItem);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 // Contribute to item
 const contributeToItem = async (req, res) => {
   try {
