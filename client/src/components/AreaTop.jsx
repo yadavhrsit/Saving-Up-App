@@ -13,7 +13,7 @@ const AreaTop = ({title}) => {
     <section className="flex items-center justify-between gap-4 flex-wrap">
       <div className="flex items-center space-x-2">
         <button
-          className="inline-flex items-center md:hidden"
+          className="inline-flex items-center md:hidden dark:text-white"
           type="button"
           onClick={openSidebar}
         >

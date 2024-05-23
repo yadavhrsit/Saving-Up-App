@@ -8,6 +8,8 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import MoonIcon from "./assets/icons/moon.svg";
 import SunIcon from "./assets/icons/sun.svg";
 import BaseLayout from "./layout/BaseLayout";
@@ -29,7 +31,7 @@ function App() {
   }, [theme]);
 
   return (
-    <>
+    <DndProvider backend={HTML5Backend}>
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -54,7 +56,7 @@ function App() {
           />
         </button>
       </Router>
-    </>
+    </DndProvider>
   );
 }
 

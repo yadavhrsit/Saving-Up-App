@@ -116,11 +116,11 @@ const Dashboard = () => {
         setUser(data);
         setData((prevData) => {
           let newData = [...prevData];
-          newData[2] = { ...newData[2], data: `$${data.totalAllocatedFunds}` };
-          newData[3] = { ...newData[3], data: `$${data.funds}` };
+          newData[2] = { ...newData[2], data: `${data.totalAllocatedFunds}` };
+          newData[3] = { ...newData[3], data: `${data.funds}` };
           newData[4] = {
             ...newData[4],
-            data: `$${data.funds - data.totalAllocatedFunds}`,
+            data: `${data.funds - data.totalAllocatedFunds}`,
           };
           return newData;
         });
@@ -144,7 +144,7 @@ const Dashboard = () => {
     setData((prevData) => {
       let newData = [...prevData]; // create a copy of the previous data
       newData[0] = { ...newData[0], data: items.length };
-      newData[1] = { ...newData[1], data: `$${totalSaved}` };
+      newData[1] = { ...newData[1], data: `${totalSaved}` };
       return newData;
     });
   };
@@ -279,7 +279,9 @@ const Dashboard = () => {
       </div>
       <div className="grid grid-cols-1 gap-4 mt-4">
         <div data-aos="fade-left">
-          <h2 className="text-lg font-semibold mb-2">Favorites</h2>
+          <h2 className="text-lg font-semibold mb-2 dark:text-white">
+            Favorites
+          </h2>
           {favorites.length > 0 ? (
             <ItemList
               items={favorites}
@@ -288,12 +290,16 @@ const Dashboard = () => {
               onToggleFavorite={toggleFavorite}
             />
           ) : (
-            <p className="text-gray-500">No favorite items found</p>
+            <p className="text-gray-500 dark:text-gray-200">
+              No favorite items found
+            </p>
           )}
         </div>
         {filteredItems.length > 0 && (
           <div data-aos="fade-right">
-            <h2 className="text-lg font-semibold mb-2">Other Items</h2>
+            <h2 className="text-lg font-semibold mb-2 dark:text-white">
+              Other Items
+            </h2>
             <ItemList
               items={filteredItems}
               onDelete={handleDeleteItem}
