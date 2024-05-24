@@ -138,7 +138,7 @@ const ItemCard = ({
                 Next Payment Date:{" "}
               </span>
               <span className="text-base lg:text-lg font-semibold text-gray-800 dark:text-gray-200">
-                {nextPaymentDate}
+                {item.nextPaymentDate}
               </span>
             </div>
           )}

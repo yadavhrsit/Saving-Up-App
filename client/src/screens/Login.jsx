@@ -104,7 +104,7 @@ function Login() {
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            placeholder="admin@gmail.com"
+            placeholder="johndoe@gmail.com"
             className="block bg-zinc-200 p-2 rounded font-medium"
             style={{ width: "100%" }}
             required

@@ -141,7 +141,7 @@ function Settings() {
       <div className="flex items-center justify-center mt-8">
         <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-8 max-w-lg w-full">
           <h1 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-gray-200">
-            Admin Details
+            User Details
           </h1>
           {successMessage && (
             <div
