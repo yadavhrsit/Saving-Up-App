@@ -78,18 +78,20 @@ const AddItemForm = ({ token }) => {
         icon: "success",
         title: "Success",
         text: response.data.message,
+      }).then(()=>{
+        setSuccessMessage(response.data.message);
+        setFormData({
+          name: "",
+          targetAmount: "",
+          image: null,
+          imagePreview: null,
+          contributionFrequency: "daily",
+          numberOfPayments: 1,
+        });
+        setFormErrors({});
+        window.location.reload();
       })
 
-      setSuccessMessage(response.data.message);
-      setFormData({
-        name: "",
-        targetAmount: "",
-        image: null,
-        imagePreview: null,
-        contributionFrequency: "daily",
-        numberOfPayments: 1,
-      });
-      setFormErrors({});
     } catch (error) {
       // Show error message
       Swal.fire({

@@ -93,11 +93,11 @@ const ItemCard = ({
     <div
       ref={ref}
       style={{ opacity: isDragging ? 0.5 : 1 }}
-      className="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4 lg:p-6 flex flex-col lg:flex-row justify-between items-center transition duration-300 ease-in-out transform hover:scale-105"
+      className="bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4 lg:p-6 flex flex-col lg:flex-row justify-between items-center transition duration-300 ease-in-out transform hover:scale-105 cursor-grab"
     >
       <div className="flex flex-col justify-between flex-grow">
         <div>
-          <h3 className="text-lg lg:text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2 lg:mb-4">
+          <h3 className="text-lg capitalize lg:text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2 lg:mb-4">
             {item.name}
           </h3>
           <div className="mb-2 lg:mb-4">

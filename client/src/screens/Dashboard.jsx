@@ -168,7 +168,7 @@ const Dashboard = () => {
         const updatedItems = items.filter((item) => item._id !== id);
         setItems(updatedItems);
         calculateTotals(updatedItems);
-        Swal.fire("Deleted!", "Your item has been deleted.", "success");
+        Swal.fire("Deleted!", "Your item has been deleted.", "success").then(() => window.location.reload());
       }
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -192,7 +192,7 @@ const Dashboard = () => {
       const updatedItems = items.map((item) => (item._id === id ? data : item));
       setItems(updatedItems);
       calculateTotals(updatedItems);
-      Swal.fire("Success!", "Your contribution was successful.", "success");
+      Swal.fire("Success!", "Your contribution was successful.", "success").then(() => window.location.reload());
     } catch (error) {
       console.error("Error contributing to item:", error);
       if (error.response && error.response.status === 401) {
@@ -223,7 +223,9 @@ const Dashboard = () => {
       const updatedItems = items.map((i) => (i._id === item._id ? data : i));
       setItems(updatedItems);
       calculateTotals(updatedItems);
-      Swal.fire("Success!", "The item has been updated.", "success");
+      Swal.fire("Success!", "The item has been updated.", "success").then(() =>
+        window.location.reload()
+      );
     } catch (error) {
       console.error("Error toggling favorite:", error);
       if (error.response && error.response.status === 401) {
