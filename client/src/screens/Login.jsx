@@ -24,6 +24,7 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
 
     try {
       const response = await fetch(`${BASE_URL}/api/user/login`, {
@@ -44,13 +45,17 @@ function Login() {
           navigate("/dashboard");
         }, 1000);
       } else {
-        setError(data.error);
+        const errorMessage =
+          data.message || data.error || "Login failed. Please try again.";
+        setError(errorMessage);
       }
     } catch (error) {
       setError("Something went wrong. Please try again.");
+      console.error(error);
       setLoading(false);
     }
   };
+
 
   const [showPassword, setShowPassword] = useState(false);
 

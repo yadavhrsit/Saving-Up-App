@@ -33,18 +33,25 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (user && (await user.matchPassword(password))) {
-      res.json({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: "Invalid email or password" });
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email" });
     }
+
+    const isPasswordCorrect = await user.matchPassword(password);
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    res.json({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      token: generateToken(user._id),
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error during login:", error);
+    res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
 
@@ -67,7 +74,7 @@ const getUserProfile = async (req, res) => {
       email: user.email,
       items: user.items,
       funds: user.funds,
-      totalAllocatedFunds, 
+      totalAllocatedFunds,
     });
   } else {
     res.status(404).json({ message: "User not found" });
