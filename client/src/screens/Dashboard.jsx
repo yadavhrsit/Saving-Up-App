@@ -7,16 +7,12 @@ import Modal from "../components/Modal";
 import AreaTop from "../components/AreaTop";
 import { AiOutlineOrderedList } from "react-icons/ai";
 import { FaPiggyBank, FaBullseye } from "react-icons/fa";
-import {
-  FaMoneyBillWave,
-  FaRegMoneyBillAlt,
-} from "react-icons/fa";
+import { FaMoneyBillWave, FaRegMoneyBillAlt } from "react-icons/fa";
 import { BASE_URL } from "../constants/api";
 import axios from "axios";
 import Swal from "sweetalert2";
 import AOS from "aos";
 import "aos/dist/aos.css";
-
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -61,8 +57,6 @@ const Dashboard = () => {
   const [favorites, setFavorites] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
-
-  
 
   useEffect(() => {
     setFilteredItems(
@@ -168,7 +162,9 @@ const Dashboard = () => {
         const updatedItems = items.filter((item) => item._id !== id);
         setItems(updatedItems);
         calculateTotals(updatedItems);
-        Swal.fire("Deleted!", "Your item has been deleted.", "success").then(() => window.location.reload());
+        Swal.fire("Deleted!", "Your item has been deleted.", "success").then(
+          () => window.location.reload()
+        );
       }
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -192,7 +188,11 @@ const Dashboard = () => {
       const updatedItems = items.map((item) => (item._id === id ? data : item));
       setItems(updatedItems);
       calculateTotals(updatedItems);
-      Swal.fire("Success!", "Your contribution was successful.", "success").then(() => window.location.reload());
+      Swal.fire(
+        "Success!",
+        "Your contribution was successful.",
+        "success"
+      ).then(() => window.location.reload());
     } catch (error) {
       console.error("Error contributing to item:", error);
       if (error.response && error.response.status === 401) {
@@ -202,7 +202,7 @@ const Dashboard = () => {
       Swal.fire(
         "Error!",
         error.response.data.error ||
-        "There was an error contributing to the item.",
+          "There was an error contributing to the item.",
         "error"
       );
     }
@@ -254,63 +254,67 @@ const Dashboard = () => {
           </div>
         ))}
       </div>
-      <div className="mt-4">
-        <input
-          type="text"
-          placeholder="Search items..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-        <button
-          className="mt-4 p-2 bg-blue-500 text-white rounded"
-          onClick={() => setShowModal(true)}
-        >
-          Add New Item
-        </button>
-        <Modal show={showModal} onClose={() => setShowModal(false)}>
-          <AddItemForm
-            token={token}
-            setItems={(newItems) => {
-              setItems(newItems);
-              setFilteredItems(newItems);
-              calculateTotals(newItems);
-            }}
-          />
-        </Modal>
-      </div>
-      <div className="grid grid-cols-1 gap-4 mt-4">
-        <div data-aos="fade-left">
-          <h2 className="text-lg font-semibold mb-2 dark:text-white">
-            Favorites
-          </h2>
-          {favorites.length > 0 ? (
-            <ItemList
-              items={favorites}
-              onDelete={handleDeleteItem}
-              onContribute={handleContribute}
-              onToggleFavorite={toggleFavorite}
+      {items.length > 0 && (
+        <>
+          <div className="mt-4">
+            <input
+              type="text"
+              placeholder="Search items..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded"
             />
-          ) : (
-            <p className="text-gray-500 dark:text-gray-200">
-              No favorite items found
-            </p>
-          )}
-        </div>
-        {filteredItems.length > 0 && (
-          <div data-aos="fade-right">
-            <h2 className="text-lg font-semibold mb-2 dark:text-white">
-              Other Items
-            </h2>
-            <ItemList
-              items={filteredItems}
-              onDelete={handleDeleteItem}
-              onContribute={handleContribute}
-              onToggleFavorite={toggleFavorite}
-            />
+            <button
+              className="mt-4 p-2 bg-blue-500 text-white rounded"
+              onClick={() => setShowModal(true)}
+            >
+              Add New Item
+            </button>
+            <Modal show={showModal} onClose={() => setShowModal(false)}>
+              <AddItemForm
+                token={token}
+                setItems={(newItems) => {
+                  setItems(newItems);
+                  setFilteredItems(newItems);
+                  calculateTotals(newItems);
+                }}
+              />
+            </Modal>
           </div>
-        )}
-      </div>
+          <div className="grid grid-cols-1 gap-4 mt-4">
+            <div data-aos="fade-left">
+              <h2 className="text-lg font-semibold mb-2 dark:text-white">
+                Favorites
+              </h2>
+              {favorites.length > 0 ? (
+                <ItemList
+                  items={favorites}
+                  onDelete={handleDeleteItem}
+                  onContribute={handleContribute}
+                  onToggleFavorite={toggleFavorite}
+                />
+              ) : (
+                <p className="text-gray-500 dark:text-gray-200">
+                  No favorite items found
+                </p>
+              )}
+            </div>
+            {filteredItems.length > 0 && (
+              <div data-aos="fade-right">
+                <h2 className="text-lg font-semibold mb-2 dark:text-white">
+                  Other Items
+                </h2>
+                <ItemList
+                  items={filteredItems}
+                  onDelete={handleDeleteItem}
+                  onContribute={handleContribute}
+                  onToggleFavorite={toggleFavorite}
+                />
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };
