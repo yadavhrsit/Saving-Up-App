@@ -18,6 +18,8 @@ import Dashboard  from "./screens/Dashboard";
 import Settings from "./screens/Settings";
 import Login from "./screens/Login";
 import Signup from "./screens/Signup";
+import PrivacyPolicy from "./screens/PrivacyPolicy";
+import TermsAndCondition from "./screens/TermsAndCondition";
 
 function App() {
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -42,6 +44,8 @@ function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<PageNotFound />} />
           </Route>
+          <Route path="privacy-policy" element={<PrivacyPolicy/>} />
+          <Route path="terms-and-conditions" element={<TermsAndCondition/>} />
         </Routes>
 
         <button
