@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
 import { BASE_URL } from "../constants/api";
+import Logo from "../assets/images/save-money.png";
 
 function Login() {
   const navigate = useNavigate();
@@ -60,7 +61,7 @@ function Login() {
 
   return (
     <div
-      className="flex justify-center items-end lg:items-center pb-5 lg:pb-0"
+      className="flex justify-center items-end lg:items-center lg:pb-0"
       style={{
         height: "100vh",
         backgroundColor: "#008dff",
@@ -71,10 +72,18 @@ function Login() {
       }}
     >
       <div
-        className={`w-100 h-[60vh] lg:h-auto ${
+        className={`w-100  lg:h-auto ${
           theme === "dark" ? " bg-zinc-600" : "bg-white"
         } px-6 lg:px-20 py-16 rounded-t-xl lg:rounded-xl`}
       >
+        <h1
+          className={`font-bold ${
+            theme === "dark" && " text-white"
+          }  text-3xl lg:text-3xl text-center`}
+        >
+          Saving UP
+        </h1>
+        <img src={Logo} alt="SavingUP" width={100} className="mx-auto mt-4" />
         <h1
           className={`font-bold ${
             theme === "dark" && " text-white"
