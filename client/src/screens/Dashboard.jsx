@@ -254,67 +254,71 @@ const Dashboard = () => {
           </div>
         ))}
       </div>
-      {items.length > 0 && (
-        <>
-          <div className="mt-4">
-            <input
-              type="text"
-              placeholder="Search items..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-            <button
-              className="mt-4 p-2 bg-blue-500 text-white rounded"
-              onClick={() => setShowModal(true)}
-            >
-              Add New Item
-            </button>
-            <Modal show={showModal} onClose={() => setShowModal(false)}>
-              <AddItemForm
-                token={token}
-                setItems={(newItems) => {
-                  setItems(newItems);
-                  setFilteredItems(newItems);
-                  calculateTotals(newItems);
-                }}
+      <div class="border-t-2 border-gray-300 my-4" />
+      <div className="mt-4">
+        {items.length > 0 && (
+          <input
+            type="text"
+            placeholder="Search items..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+        )}
+
+        <button
+          className="mt-4 p-2 bg-blue-500 text-white rounded"
+          onClick={() => setShowModal(true)}
+        >
+          Add New Item
+        </button>
+        <div class="border-t-2 border-gray-300 my-4" />
+        <Modal show={showModal} onClose={() => setShowModal(false)}>
+          <AddItemForm
+            token={token}
+            setItems={(newItems) => {
+              setItems(newItems);
+              setFilteredItems(newItems);
+              calculateTotals(newItems);
+            }}
+          />
+        </Modal>
+      </div>
+      <div className="grid grid-cols-1 gap-4 mt-4">
+        {items.length > 0 && (
+          <div data-aos="fade-left">
+            <h2 className="text-lg font-semibold mb-2 dark:text-white">
+              Favorites
+            </h2>
+            {favorites.length > 0 ? (
+              <ItemList
+                items={favorites}
+                onDelete={handleDeleteItem}
+                onContribute={handleContribute}
+                onToggleFavorite={toggleFavorite}
               />
-            </Modal>
-          </div>
-          <div className="grid grid-cols-1 gap-4 mt-4">
-            <div data-aos="fade-left">
-              <h2 className="text-lg font-semibold mb-2 dark:text-white">
-                Favorites
-              </h2>
-              {favorites.length > 0 ? (
-                <ItemList
-                  items={favorites}
-                  onDelete={handleDeleteItem}
-                  onContribute={handleContribute}
-                  onToggleFavorite={toggleFavorite}
-                />
-              ) : (
-                <p className="text-gray-500 dark:text-gray-200">
-                  No favorite items found
-                </p>
-              )}
-            </div>
-            {filteredItems.length > 0 && (
-              <div data-aos="fade-right">
-                <h2 className="text-lg font-semibold mb-2 dark:text-white">
-                  Other Items
-                </h2>
-                <ItemList
-                  items={filteredItems}
-                  onDelete={handleDeleteItem}
-                  onContribute={handleContribute}
-                  onToggleFavorite={toggleFavorite}
-                />
-              </div>
+            ) : (
+              <p className="text-gray-500 dark:text-gray-200">
+                No favorite items found
+              </p>
             )}
           </div>
-        </>
-      )}
+        )}
+        {filteredItems.length > 0 && (
+          <div data-aos="fade-right">
+            <div class="border-t-2 border-gray-300 my-4" />
+            <h2 className="text-lg font-semibold mb-2 dark:text-white">
+              Other Items
+            </h2>
+            <ItemList
+              items={filteredItems}
+              onDelete={handleDeleteItem}
+              onContribute={handleContribute}
+              onToggleFavorite={toggleFavorite}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
