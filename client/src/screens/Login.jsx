@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
-import {BASE_URL} from "../constants/api";
+import { BASE_URL } from "../constants/api";
 
 function Login() {
   const navigate = useNavigate();
@@ -55,7 +55,6 @@ function Login() {
       setLoading(false);
     }
   };
-
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -141,7 +140,10 @@ function Login() {
               {showPassword ? "👁️" : "🔒"}
             </button>
           </div>
-          <Link to={"/register"} className="mt-2">Not a registered user? Signup</Link>
+          <Link to={"/register"} className="mt-2 text-black dark:text-gray-100">
+            Not a registered user? Signup
+          </Link>
+
           {error && <p className="text-red-500 mt-2">{error}</p>}
           {success && <p className="text-green-500 mt-2">{success}</p>}
           <div
@@ -156,6 +158,17 @@ function Login() {
             </button>
           </div>
         </form>
+        <div className="flex justify-between gap-4 mt-8 text-black dark:text-gray-100">
+          <Link to={"/privacy-policy"} className="dark:hover:text-gray-300">
+            Privacy Policy
+          </Link>
+          <Link
+            to={"/terms-and-conditions"}
+            className="dark:hover:text-gray-300"
+          >
+            Terms and Conditions
+          </Link>
+        </div>
       </div>
     </div>
   );

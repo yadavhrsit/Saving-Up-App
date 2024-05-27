@@ -193,7 +193,7 @@ function Signup() {
               {showPassword ? "👁️" : "🔒"}
             </button>
           </div>
-          <Link to={"/login"} className="mt-2">
+          <Link to={"/login"} className="mt-2 text-black dark:text-gray-100">
             Already a registered user? Sign In
           </Link>
           {error && <p className="text-red-500 mt-2">{error}</p>}
@@ -210,6 +210,20 @@ function Signup() {
             </button>
           </div>
         </form>
+        <div className="flex justify-between gap-4 mt-8 text-black dark:text-gray-100">
+          <Link
+            to={"/privacy-policy"}
+            className="hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            Privacy Policy
+          </Link>
+          <Link
+            to={"/terms-and-conditions"}
+            className="hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            Terms and Conditions
+          </Link>
+        </div>
       </div>
     </div>
   );
