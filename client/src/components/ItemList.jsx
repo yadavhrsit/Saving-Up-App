@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import ItemCard from "./ItemCard";
 
-const ItemList = ({ items, onDelete, onContribute, onToggleFavorite }) => {
+const ItemList = ({
+  items,
+  onDelete,
+  onContribute,
+  onToggleFavorite,
+  setUpdateId,
+  setShowModalEdit,
+}) => {
   const [itemList, setItemList] = useState(items);
 
   const moveCard = (fromId, toId) => {
@@ -23,6 +30,8 @@ const ItemList = ({ items, onDelete, onContribute, onToggleFavorite }) => {
           onDelete={onDelete}
           onContribute={onContribute}
           onToggleFavorite={onToggleFavorite}
+          setUpdateId={setUpdateId}
+          setShowModalEdit={setShowModalEdit}
         />
       ))}
     </div>

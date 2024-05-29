@@ -25,6 +25,6 @@ router.delete("/:id/delete", protect, deleteItem);
 router.put("/:id/favorite", protect, markAsFavorite);
 router.put("/:id/unfavorite", protect, removeFromFavorite);
 
-router.put("/:id/update", protect, updateItem);
+router.put("/:id/update", protect, upload.single("image"), updateItem);
 
 module.exports = router;

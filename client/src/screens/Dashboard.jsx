@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import DataCard from "../components/DataCard";
 import ItemList from "../components/ItemList";
 import AddItemForm from "../components/AddItemForm";
+import UpdateItemForm from "../components/UpdateItemForm";
 import Modal from "../components/Modal";
 import AreaTop from "../components/AreaTop";
 import { AiOutlineOrderedList } from "react-icons/ai";
@@ -57,6 +58,8 @@ const Dashboard = () => {
   const [favorites, setFavorites] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showModalEdit, setShowModalEdit] = useState(false);
+  const [updateId, setUpdateId] = useState(null);
 
   useEffect(() => {
     setFilteredItems(
@@ -283,6 +286,9 @@ const Dashboard = () => {
             }}
           />
         </Modal>
+        <Modal show={showModalEdit} onClose={() => setShowModalEdit(false)}>
+          <UpdateItemForm token={token} id={updateId} />
+        </Modal>
       </div>
       <div className="grid grid-cols-1 gap-4 mt-4">
         {items.length > 0 && (
@@ -296,6 +302,8 @@ const Dashboard = () => {
                 onDelete={handleDeleteItem}
                 onContribute={handleContribute}
                 onToggleFavorite={toggleFavorite}
+                setUpdateId={setUpdateId}
+                setShowModalEdit={setShowModalEdit}
               />
             ) : (
               <p className="text-gray-500 dark:text-gray-200">
@@ -315,6 +323,8 @@ const Dashboard = () => {
               onDelete={handleDeleteItem}
               onContribute={handleContribute}
               onToggleFavorite={toggleFavorite}
+              setUpdateId={setUpdateId}
+              setShowModalEdit={setShowModalEdit}
             />
           </div>
         )}

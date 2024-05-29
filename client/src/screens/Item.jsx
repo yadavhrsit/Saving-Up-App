@@ -56,7 +56,11 @@ function Item() {
                 className="text-gray-600 dark:text-gray-300"
                 rel="noreferrer"
               >
-                Click to view on marketplace : {url}
+                <span className="font-bold">
+                  Click to view on marketplace :{" "}
+                </span>{" "}
+                <br />
+                <span className=" italic">{url}</span>
               </a>
             </div>
           </div>

@@ -6,6 +6,7 @@ import {
   FaStar,
   FaRegStar,
   FaEye,
+  FaEdit,
 } from "react-icons/fa";
 import moment from "moment";
 import { Link } from "react-router-dom";
@@ -18,6 +19,8 @@ const ItemCard = ({
   onDelete,
   onContribute,
   onToggleFavorite,
+  setUpdateId,
+  setShowModalEdit,
 }) => {
   const ref = useRef(null);
 
@@ -124,6 +127,15 @@ const ItemCard = ({
             className="flex items-center justify-center px-3 lg:px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition duration-300 ease-in-out transform hover:scale-105"
           >
             <FaTrash size="1.25em" />
+          </button>
+          <button
+            onClick={() => {
+              setUpdateId(item._id);
+              setShowModalEdit(true);
+            }}
+            className="flex items-center justify-center px-3 lg:px-4 py-2 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600 transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            <FaEdit size="1.25em" />
           </button>
           <button
             onClick={() => onToggleFavorite(item)}

@@ -28,7 +28,7 @@ const getItemById = async (req, res) => {
     const item = await Item.findById(req.params.id).populate("user");
     const contributions = await Contribution.find({ item: item._id });
     if (item) {
-      res.json({item, contributions});
+      res.json({ item, contributions });
     } else {
       res.status(404).json({ message: "Item not found" });
     }
@@ -140,15 +140,35 @@ const removeFromFavorite = async (req, res) => {
 
 // Update item
 const updateItem = async (req, res) => {
-  const { name, image } = req.body;
   try {
-    const itemId = req.params.id;
+    const { id } = req.params;
+    const {
+      name,
+      targetAmount,
+      url,
+      contributionFrequency,
+      numberOfPayments,
+      contributionDay,
+      contributionDate,
+      favorite,
+    } = req.body;
+    const image = req.file ? req.file.buffer.toString("base64") : null;
+    if (image) {
+      updateData.image = image;
+    }
     const userId = req.user.id;
-    const item = await Item.findById({ _id: itemId, user: userId });
-    console.log(item);
+    const item = await Item.findById({ _id: id, user: userId });
     if (item) {
       item.name = name || item.name;
       item.image = image || item.image;
+      item.targetAmount = targetAmount || item.targetAmount;
+      item.url = url || item.url;
+      item.contributionFrequency =
+        contributionFrequency || item.contributionFrequency;
+      item.numberOfPayments = numberOfPayments || item.numberOfPayments;
+      item.contributionDay = contributionDay || item.contributionDay;
+      item.contributionDate = contributionDate || item.contributionDate;
+      item.favorite = favorite || item.favorite;
       const updatedItem = await item.save();
       res.json(updatedItem);
     } else {
