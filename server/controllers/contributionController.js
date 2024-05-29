@@ -1,4 +1,4 @@
-const Contribution = require("../models/Contribution");
+const Contribution = require("../models/contribution");
 const Item = require("../models/Item");
 const moment = require("moment");
 

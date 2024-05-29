@@ -1,6 +1,6 @@
 const Item = require("../models/Item");
 const User = require("../models/User");
-const Contribution = require("../models/Contribution");
+const Contribution = require("../models/contribution");
 const moment = require("moment");
 const cloudinary = require("cloudinary").v2;
 
