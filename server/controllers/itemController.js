@@ -1,6 +1,8 @@
 const Item = require("../models/Item");
 const User = require("../models/User");
+const Contribution = require("../models/Contribution");
 const moment = require("moment");
+const cloudinary = require("cloudinary").v2;
 
 // Get all items
 const getAllItems = async (req, res) => {
@@ -23,9 +25,10 @@ const getAllItems = async (req, res) => {
 // Get item by ID
 const getItemById = async (req, res) => {
   try {
-    const item = await Item.findById(req.params.id);
+    const item = await Item.findById(req.params.id).populate("user");
+    const contributions = await Contribution.find({ item: item._id });
     if (item) {
-      res.json(item);
+      res.json({item, contributions});
     } else {
       res.status(404).json({ message: "Item not found" });
     }
@@ -37,20 +40,30 @@ const getItemById = async (req, res) => {
 // Create new item
 const createItem = async (req, res) => {
   try {
-    const { name, targetAmount, contributionFrequency, contributedAmount } = req.body;
+    const {
+      name,
+      targetAmount,
+      contributionFrequency,
+      contributionDay,
+      contributionDate,
+      numberOfPayments,
+      url,
+    } = req.body;
     const userId = req.user.id;
 
-    // Fetch user and user's items
     const user = await User.findById(userId);
     const items = await Item.find({ user: userId });
 
-    // Calculate total target amount of all items
-    const totalTargetAmount = items.reduce((sum, item) => sum + item.targetAmount, 0);
+    const totalTargetAmount = items.reduce(
+      (sum, item) => sum + item.targetAmount,
+      0
+    );
 
-    // Check if total target amount exceeds user's balance
     if (totalTargetAmount + parseInt(targetAmount) > user.funds) {
-
-      return res.status(400).json({ message: "You cannot add this item because its target amount will exceed your current funds." });
+      return res.status(400).json({
+        message:
+          "You cannot add this item because its target amount will exceed your current funds.",
+      });
     }
 
     let image = null;
@@ -64,7 +77,10 @@ const createItem = async (req, res) => {
       user: userId,
       targetAmount,
       contributionFrequency,
-      contributedAmount,
+      contributionDay,
+      contributionDate,
+      numberOfPayments,
+      url,
     });
 
     const createdItem = await item.save();
@@ -73,63 +89,6 @@ const createItem = async (req, res) => {
     res.status(201).json(createdItem);
   } catch (error) {
     res.status(500).json({ message: error.message });
-  }
-};
-// Contribute to item
-const contributeToItem = async (req, res) => {
-  try {
-    const item = await Item.findById(req.params.id);
-
-    if (!item) {
-      return res.status(404).json({ error: "Item not found" });
-    }
-
-    if (item.user.toString() !== req.user.id) {
-      return res.status(403).json({ error: "Unauthorized" });
-    }
-
-    const today = moment().startOf("day");
-    const nextPaymentDate = moment(item.nextPaymentDate, "MMMM Do, YYYY");
-
-    // Check 
-    if (today.isBefore(nextPaymentDate, "day")) {
-      return res.status(400).json({
-        error: "Contribution is only allowed on or after the next payment date",
-      });
-    }
-
-    let isPaymentDay = false;
-    let contributionAmount = 0;
-
-    switch (item.contributionFrequency) {
-      case "daily":
-        isPaymentDay = true;
-        contributionAmount = item.targetAmount / 30; // Assuming 30 days for monthly target
-        break;
-      case "weekly":
-        isPaymentDay = today.day() >= moment(item.startDate).day();
-        contributionAmount = item.targetAmount / 4; // Assuming 4 weeks for monthly target
-        break;
-      case "monthly":
-        isPaymentDay = today.date() >= moment(item.startDate).date();
-        contributionAmount = item.targetAmount / 1; // Full amount for monthly target
-        break;
-      default:
-        break;
-    }
-
-    // Ensure contribution doesn't exceed the remaining budget
-    const remainingBudget = item.targetAmount - item.contributedAmount;
-    contributionAmount = Math.min(contributionAmount, remainingBudget);
-
-    // Update item's contributed amount
-    item.contributedAmount += contributionAmount;
-    await item.save();
-
-    res.status(200).json(item);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Error contributing to item" });
   }
 };
 
@@ -212,6 +171,14 @@ const deleteItem = async (req, res) => {
       return res.status(404).json({ error: "Item not found" });
     }
 
+    // Delete the associated image if it exists
+    if (item.image) {
+      // Extract the public ID from the image URL
+      const publicId = item.image.split("/").pop().split(".")[0];
+      // Delete the image from Cloudinary
+      await cloudinary.uploader.destroy(publicId);
+    }
+
     await User.findByIdAndUpdate(userId, { $pull: { items: item._id } });
 
     res.status(200).json({ message: "Item deleted successfully" });
@@ -224,7 +191,6 @@ module.exports = {
   getAllItems,
   getItemById,
   createItem,
-  contributeToItem,
   markAsFavorite,
   getFrequencyInDays,
   removeFromFavorite,

@@ -1,7 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
-import { FaTrash, FaPlusCircle, FaHeart, FaRegHeart } from "react-icons/fa";
+import {
+  FaTrash,
+  FaPlusCircle,
+  FaStar,
+  FaRegStar,
+  FaEye,
+} from "react-icons/fa";
 import moment from "moment";
+import { Link } from "react-router-dom";
 
 const ItemType = "ITEM_CARD";
 
@@ -13,55 +20,9 @@ const ItemCard = ({
   onToggleFavorite,
 }) => {
   const ref = useRef(null);
-  const [isContributionDay, setIsContributionDay] = useState(false);
-  const [missedContributions, setMissedContributions] = useState(0);
-  const [nextPaymentDate, setNextPaymentDate] = useState(null);
-
-  useEffect(() => {
-    const calculateContributionStatus = () => {
-      const today = moment();
-      let shouldContribute = false;
-      let missedCount = 0;
-
-      if (item.contributionFrequency === "daily") {
-        shouldContribute = true;
-      } else if (item.contributionFrequency === "weekly") {
-        const startDay = moment(item.startDate).day();
-        shouldContribute = today.day() === startDay || today.day() > startDay;
-      } else if (item.contributionFrequency === "monthly") {
-        const startDate = moment(item.startDate).date();
-        shouldContribute =
-          today.date() === startDate || today.date() > startDate;
-      }
-
-      setIsContributionDay(shouldContribute);
-
-      if (!shouldContribute) {
-        const startDate = moment(item.startDate);
-        const endDate = today.clone().subtract(1, "day");
-        const duration = moment.duration(endDate.diff(startDate)).asDays();
-        missedCount = Math.max(
-          0,
-          Math.floor(duration / getFrequencyInDays(item.contributionFrequency))
-        );
-      }
-
-      setMissedContributions(missedCount);
-
-      const nextDate = moment(item.startDate).add(
-        missedCount + 1,
-        item.contributionFrequency
-      );
-      setNextPaymentDate(nextDate.format("MMMM Do, YYYY"));
-    };
-
-    calculateContributionStatus();
-  }, [item.contributionFrequency, item.startDate]);
 
   const handleContribute = () => {
-    if (isContributionDay || missedContributions > 0) {
-      onContribute(item._id);
-    }
+    onContribute(item._id, item.contributionAmount);
   };
 
   const progressPercentage = Math.min(
@@ -124,24 +85,15 @@ const ItemCard = ({
               ${item.remainingAmount}
             </span>
           </div>
+
           <div className="mb-2 lg:mb-4">
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              Missed Contributions:{" "}
+              Next Payment Date:{" "}
             </span>
             <span className="text-base lg:text-lg font-semibold text-gray-800 dark:text-gray-200">
-              {missedContributions}
+              {moment(item.nextPaymentDate).format("MMM Do YY")}
             </span>
           </div>
-          {nextPaymentDate && (
-            <div className="mb-2 lg:mb-4">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                Next Payment Date:{" "}
-              </span>
-              <span className="text-base lg:text-lg font-semibold text-gray-800 dark:text-gray-200">
-                {item.nextPaymentDate}
-              </span>
-            </div>
-          )}
         </div>
         <div className="flex items-center w-full mb-2 lg:mb-4">
           <div className="w-full bg-gray-200 h-2 lg:h-3 rounded-full overflow-hidden">
@@ -160,14 +112,13 @@ const ItemCard = ({
           </p>
         </div>
         <div className="flex space-x-2 lg:space-x-4">
-          {(isContributionDay || missedContributions > 0) && (
-            <button
-              onClick={handleContribute}
-              className="flex items-center text-nowrap justify-center px-3 lg:px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition duration-300 ease-in-out transform hover:scale-105"
-            >
-              Pay Now <FaPlusCircle size="1.25em" className="ml-1 lg:ml-2" />
-            </button>
-          )}
+          <button
+            onClick={handleContribute}
+            className="flex items-center text-nowrap justify-center px-3 lg:px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Pay Now <FaPlusCircle size="1.25em" className="ml-1 lg:ml-2" />
+          </button>
+
           <button
             onClick={() => onDelete(item._id)}
             className="flex items-center justify-center px-3 lg:px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition duration-300 ease-in-out transform hover:scale-105"
@@ -176,14 +127,20 @@ const ItemCard = ({
           </button>
           <button
             onClick={() => onToggleFavorite(item)}
-            className="flex items-center justify-center px-3 lg:px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition duration-300 ease-in-out transform hover:scale-105"
+            className="flex items-center justify-center px-3 lg:px-4 py-2 bg-amber-500 text-white rounded-lg shadow hover:bg-amber-600 transition duration-300 ease-in-out transform hover:scale-105"
           >
             {item.favorite ? (
-              <FaHeart size="1.25em" />
+              <FaStar size="1.25em" />
             ) : (
-              <FaRegHeart size="1.25em" />
+              <FaRegStar size="1.25em" />
             )}
           </button>
+          <Link
+            to={`/items/${item._id}`}
+            className="flex items-center text-nowrap justify-center px-3 lg:px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            View <FaEye size="1.25em" className="ml-1 lg:ml-2" />
+          </Link>
         </div>
       </div>
       <div className="w-full lg:w-2/5 mt-4 lg:mt-0 lg:order-first lg:pl-6 mx-1">
@@ -197,20 +154,6 @@ const ItemCard = ({
       </div>
     </div>
   );
-
 };
 
 export default ItemCard;
-
-const getFrequencyInDays = (frequency) => {
-  switch (frequency) {
-    case "daily":
-      return 1;
-    case "weekly":
-      return 7;
-    case "monthly":
-      return 30;
-    default:
-      return 1;
-  }
-};

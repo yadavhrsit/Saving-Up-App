@@ -20,6 +20,7 @@ import Login from "./screens/Login";
 import Signup from "./screens/Signup";
 import PrivacyPolicy from "./screens/PrivacyPolicy";
 import TermsAndCondition from "./screens/TermsAndCondition";
+import Item from "./screens/Item";
 
 function App() {
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -41,6 +42,7 @@ function App() {
           <Route element={<BaseLayout />}>
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/items/:id" element={<Item />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<PageNotFound />} />
           </Route>

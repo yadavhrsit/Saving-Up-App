@@ -10,17 +10,18 @@ function Settings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
     funds: 0,
-    password: "",
+    currentPassword: "",
+    newPassword: "",
   });
   const [formErrors, setFormErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState(null);
   const [unchangedMessage, setUnchangedMessage] = useState(null);
 
   useEffect(() => {
-    const fetchAdminDetails = async () => {
+    const fetchUserDetails = async () => {
       try {
         const token = localStorage.getItem("saving_up_token");
         const response = await axios.get(`${BASE_URL}/api/user/profile`, {
@@ -32,10 +33,11 @@ function Settings() {
         setUser(userData);
         setInitialUser(userData);
         setFormData({
-          name: userData.username,
+          username: userData.username,
           email: userData.email,
           funds: userData.funds,
-          password: "",
+          currentPassword: "",
+          newPassword: "",
         });
         setLoading(false);
       } catch (error) {
@@ -44,7 +46,7 @@ function Settings() {
       }
     };
 
-    fetchAdminDetails();
+    fetchUserDetails();
   }, []);
 
   const handleChange = (e) => {
@@ -57,15 +59,23 @@ function Settings() {
   const validateForm = (data) => {
     let errors = {};
 
-    if (!data.name) errors.name = "Name is required";
+    if (!data.username) errors.name = "Name is required";
     if (!data.email) errors.email = "Email is required";
-    if (data.email && !/\S+@\S+\.\S+/.test(data.email)) errors.email = "Invalid email address";
-    if (data.funds && isNaN(data.funds)) errors.funds = "Funds must be a number";
+    if (data.email && !/\S+@\S+\.\S+/.test(data.email))
+      errors.email = "Invalid email address";
+    if (data.funds && isNaN(data.funds))
+      errors.funds = "Funds must be a number";
     if (data.password && data.password.length < 6)
       errors.password = "Password must be at least 6 characters long";
 
+    // Check if new password is provided without the current password
+    if (data.newPassword && !data.currentPassword)
+      errors.currentPassword =
+        "Current Password is required to change the password";
+
     return errors;
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,10 +90,11 @@ function Settings() {
 
     // Check if form data is unchanged
     if (
-      formData.name === initialUser.username &&
+      formData.username === initialUser.username &&
       formData.email === initialUser.email &&
       formData.funds === initialUser.funds &&
-      formData.password === ""
+      formData.currentPassword === "" &&
+      formData.newPassword === ""
     ) {
       setUnchangedMessage("No changes to update");
       return;
@@ -107,13 +118,20 @@ function Settings() {
       setSuccessMessage("Details updated successfully");
       setFormErrors({});
       setLoading(false);
-      swal.fire("Success", "Details updated successfully", "success");
+      swal
+        .fire("Success", "Details updated successfully", "success")
+        .then(() => {
+          window.location.reload();
+        });
     } catch (error) {
       setError(error.response.data.message || error.message);
       setLoading(false);
-      swal.fire("Error", error.response.data.message || error.message, "error");
+      swal.fire("Error", error.response.data.message || error.message, "error").then(() => {
+        window.location.reload();
+      });
     }
   };
+
 
   if (loading)
     return (
@@ -166,8 +184,8 @@ function Settings() {
               </label>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
+                name="username"
+                value={formData.username}
                 onChange={handleChange}
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                   formErrors.name
@@ -225,22 +243,35 @@ function Settings() {
             </div>
             <div>
               <label className="block text-gray-700 dark:text-gray-300">
-                Password:
+                Current Password:
               </label>
               <input
                 type="password"
-                name="password"
-                value={formData.password}
+                name="currentPassword"
+                value={formData.currentPassword}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                  formErrors.password
-                    ? "border-red-500 focus:ring-red-400"
-                    : "focus:ring-blue-400"
-                }`}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               {formErrors.password && (
                 <div className="text-red-500 text-sm mt-1">
                   {formErrors.password}
+                </div>
+              )}
+            </div>
+            <div>
+              <label className="block text-gray-700 dark:text-gray-300">
+                New Password:
+              </label>
+              <input
+                type="password"
+                name="newPassword"
+                value={formData.newPassword}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              {formErrors.newPassword && (
+                <div className="text-red-500 text-sm mt-1">
+                  {formErrors.newPassword}
                 </div>
               )}
             </div>

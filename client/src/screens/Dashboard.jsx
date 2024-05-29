@@ -254,7 +254,7 @@ const Dashboard = () => {
           </div>
         ))}
       </div>
-      <div class="border-t-2 border-gray-300 my-4" />
+      <div className="border-t-2 border-gray-300 my-4" />
       <div className="mt-4">
         {items.length > 0 && (
           <input
@@ -272,7 +272,7 @@ const Dashboard = () => {
         >
           Add New Item
         </button>
-        <div class="border-t-2 border-gray-300 my-4" />
+        <div className="border-t-2 border-gray-300 my-4" />
         <Modal show={showModal} onClose={() => setShowModal(false)}>
           <AddItemForm
             token={token}
@@ -306,7 +306,7 @@ const Dashboard = () => {
         )}
         {filteredItems.length > 0 && (
           <div data-aos="fade-right">
-            <div class="border-t-2 border-gray-300 my-4" />
+            <div className="border-t-2 border-gray-300 my-4" />
             <h2 className="text-lg font-semibold mb-2 dark:text-white">
               Other Items
             </h2>

@@ -118,7 +118,7 @@ function Signup() {
               theme === "dark" ? "text-gray-50" : "text-zinc-500"
             }  font-semibold text-left text-sm block my-1`}
           >
-            Username:
+            Name:
           </label>
           <input
             type="text"

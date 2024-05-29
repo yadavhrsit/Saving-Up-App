@@ -85,22 +85,48 @@ const getUserProfile = async (req, res) => {
 const updateUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id);
   if (user) {
+    const initialData = {
+      username: user.username,
+      email: user.email,
+      funds: user.funds,
+      password: user.password,
+    };
+
     user.username = req.body.username || user.username;
     user.email = req.body.email || user.email;
     user.funds = req.body.funds || user.funds;
-    if (req.body.password) {
-      user.password = req.body.password;
+    if (req.body.newPassword) {
+      if (user.password === req.body.currentPassword) {
+        user.password = req.body.newPassword;
+      } else {
+        return res.status(400).json({ message: "Invalid password" });
+      }
     }
     const updatedUser = await user.save();
-    res.json({
-      _id: updatedUser._id,
+
+    const updatedData = {
       username: updatedUser.username,
       email: updatedUser.email,
       funds: updatedUser.funds,
-      token: generateToken(updatedUser._id),
-    });
+      password: updatedUser.password,
+    };
+
+    const isUpdated =
+      JSON.stringify(initialData) !== JSON.stringify(updatedData);
+
+    if (!isUpdated) {
+      return res.status(404).json({ message: "Nothing to Update" });
+    } else {
+      return res.json({
+        _id: updatedUser._id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        funds: updatedUser.funds,
+        isUpdated,
+      });
+    }
   } else {
-    res.status(404).json({ message: "User not found" });
+    return res.status(404).json({ message: "User not found" });
   }
 };
 
