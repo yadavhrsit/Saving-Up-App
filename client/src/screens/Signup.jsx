@@ -57,7 +57,8 @@ function Signup() {
           navigate("/login");
         }, 1000);
       } else {
-        setError(data.error || "Error creating account. Please try again.");
+        console.log(data);
+        setError(data.error || data.message || "Error creating account. Please try again.");
       }
     } catch (error) {
       setError("Something went wrong. Please try again.");
