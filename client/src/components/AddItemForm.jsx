@@ -346,7 +346,7 @@ const AddItemForm = ({ token }) => {
                     className="mt-1 block w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-300"
                   >
                     <option value="">Select Date</option>
-                    {[...Array(28)].map((_, i) => (
+                    {[...Array(31)].map((_, i) => (
                       <option key={i + 1} value={i + 1}>
                         {i + 1}
                       </option>
