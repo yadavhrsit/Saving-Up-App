@@ -18,7 +18,13 @@ const AddItemForm = ({ token }) => {
     contributionDate: "", // for monthly contributions
     favorite: false,
   });
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState({
+    targetAmount: "",
+    numberOfPayments: "",
+    name: "",
+    contributionDay: "",
+    contributionDate: "",
+  });
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showRedirect, setShowRedirect] = useState(false);
@@ -51,6 +57,33 @@ const AddItemForm = ({ token }) => {
     e.preventDefault();
     setSuccessMessage("");
     setErrorMessage("");
+
+    if(formData.targetAmount === "") {
+      setFormErrors({ targetAmount: "Target amount is required." });
+    }
+    if(formData.numberOfPayments === "") {
+      setFormErrors({ numberOfPayments: "Number of payments is required." });
+    }
+    if(formData.name === "") {
+      setFormErrors({ name: "Item name is required." });
+    }
+
+    if (formData.targetAmount < 0) {
+      setFormErrors({ targetAmount: "Target amount must be a positive number." });
+    }
+    if (formData.numberOfPayments < 1) {
+      setFormErrors({ numberOfPayments: "Number of payments must be a positive number." });
+    }
+    if (formData.contributionFrequency === "weekly" && !formData.contributionDay) {
+      setFormErrors({ contributionDay: "Please select a contribution day." });
+    }
+    if (formData.contributionFrequency === "monthly" && !formData.contributionDate) {
+      setFormErrors({ contributionDate: "Please select a contribution date." });
+    }
+    if (formData.name.length > 50) { 
+      setFormErrors({ name: "Item name must be less than 50 characters." });
+    }
+
 
     if (
       !formData.name ||
@@ -173,7 +206,7 @@ const AddItemForm = ({ token }) => {
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 dark:text-gray-300">
-              Item Name
+              Item Name {formErrors.name && <span className="text-red-600">*</span>}
             </label>
             <input
               type="text"
@@ -219,7 +252,7 @@ const AddItemForm = ({ token }) => {
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 dark:text-gray-300">
-              Target Amount
+              Target Amount {formErrors.targetAmount && <span className="text-red-600">*</span>}
             </label>
             <input
               type="number"
