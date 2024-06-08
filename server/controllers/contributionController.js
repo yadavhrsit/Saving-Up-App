@@ -17,20 +17,13 @@ const contributeToItem = async (req, res) => {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
-    const today = moment().startOf("day");
-    const nextPaymentDate = moment(item.nextPaymentDate);
-
-    if (today.isBefore(nextPaymentDate, "day")) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Contribution is only allowed on or after the next payment date",
-        });
+    if(item.contributedAmount >= item.targetAmount) {
+      return res.status(400).json({ error: "Item already fully funded" });
     }
 
     const remainingBudget = item.targetAmount - item.contributedAmount;
     const contributionAmount = Math.min(amount, remainingBudget);
+
 
     const contribution = new Contribution({
       item: item._id,
